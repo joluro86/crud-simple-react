@@ -5,7 +5,8 @@ function App() {
 
   const [tarea, setTarea] = React.useState('')
   const [tareas, setTareas] = React.useState([])
-
+  const [modoEdicion, setmodoEdicion] = React.useState(false)
+  const [id, setId] = React.useState('')
 
   const agregarTarea = e => {
     e.preventDefault()
@@ -21,11 +22,33 @@ function App() {
     setTarea('')
   }
 
-  const eliminarTarea= id => {
-    const arrayFiltrado= tareas.filter(item => item.id !== id)
+  const eliminarTarea = id => {
+    const arrayFiltrado = tareas.filter(item => item.id !== id)
     setTareas(arrayFiltrado)
   }
 
+  const editar = item => {
+    console.log(item)
+    setmodoEdicion(true)
+    setTarea(item.nombreTarea)
+    setId(item.id)
+  }
+
+  const actualizarTarea = e => {
+    e.preventDefault()
+
+    if (!tarea.trim()) {
+      console.log('vacio')
+      return
+    }
+
+    const arrayEditado = tareas.map(item => item.id === id ? { id: id, nombreTarea: tarea } : item)
+
+    setTareas(arrayEditado)
+    setmodoEdicion(false)
+    setTarea('')
+    setId('')
+  }
 
   return (
     <div className="container">
@@ -45,12 +68,13 @@ function App() {
                     <span className="lead">{item.nombreTarea}</span>
                     <button
                       className="btn btn-sm btn-danger float-right mx-2"
-                      onClick={()=> eliminarTarea(item.id)}
+                      onClick={() => eliminarTarea(item.id)}
                     >
                       Eliminar
                     </button>
                     <button
                       className="btn btn-sm btn-warning float-right"
+                      onClick={() => editar(item)}
                     >Editar</button>
                   </li>
                 ))
@@ -60,9 +84,9 @@ function App() {
 
           <div className="col-4">
             <h4 className="text-center">
-              Agregar Tarea
+              {modoEdicion ? 'Editar tarea' : 'Agregar Tarea'}
             </h4>
-            <form onSubmit={agregarTarea} >
+            <form onSubmit={modoEdicion ? actualizarTarea : agregarTarea} >
               <input
                 type="text"
                 className="form-control mb-2"
@@ -70,7 +94,14 @@ function App() {
                 onChange={e => setTarea(e.target.value)}
                 value={tarea}
               />
-              <button className="btn btn-dark btn-block" type="submit">Agregar</button>
+
+              {modoEdicion ? (
+                <button className="btn btn-warning btn-block" type="submit">Actualizar</button>
+              ) : (
+                <button className="btn btn-dark btn-block" type="submit">Guardar</button>
+              )
+              }
+
             </form>
           </div>
 
